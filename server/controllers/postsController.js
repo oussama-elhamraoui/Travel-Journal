@@ -1,4 +1,6 @@
 import {findAllPosts,findPostById,create,update,remove} from '../models/postsModel.js'
+import fs from 'fs/promises'
+import path from 'path'
 
 export async function getPosts(req,res,next){
     try{
@@ -30,7 +32,27 @@ export async function getPost(req,res,next){
 
 export async function createPost(req,res,next){
     try{
-        const post = req.body
+        const { title, location, googlemapsurl, startdate, enddate, description } = req.body;
+        if (!title || !location || !googlemapsurl || !startdate || !enddate || !description) {
+            return res.status(400).json({ msg: 'Missing required fields' });
+        }
+        if (!req.file) {
+            console.log(req.file)
+            return res.status(400).json({ msg: 'File upload failed' });
+        }
+        const fileName = req.file.filename;
+        console.log('Uploaded file name:', fileName);
+        const fileUrl = `http://localhost:5000/uploads/${fileName}`;
+        
+        const post = {
+            title,
+            location,
+            googlemapsurl,
+            startdate,
+            enddate,
+            description,
+            imageurl: fileUrl,
+        };
         const newPost = await create(post)
         if(!newPost){
             res.status(400).json({msg:"Error while creating the post"})
@@ -45,21 +67,22 @@ export async function createPost(req,res,next){
 export async function updatePost(req,res,next){
     try{
         const postId = req.params.id
-        let post = await findPostById(postId)
-        console.log(post)
+        const post = await findPostById(postId)
+        console.log(post.googlemapsurl)
         if(!post){
             res.status(404).send({msg:"Not Found"})
         }else{
             const body = req.body
-            post = post[0]
+            console.log(body, 'body')
+            console.log("post: 7 ", post.googlemapsurl)
             const postData = {
                 title: body.title || post.title,
                 location: body.location || post.location,
-                googleMapsUrl: body.googleMapsUrl || post.googleMapsUrl,
-                startDate: body.startDate || post.startDate,
-                endDate: body.endDate || post.endDate,
+                googlemapsurl: body.googlemapsurl || post.googlemapsurl,
+                startdate: body.startdate || post.startdate,
+                enddate: body.enddate || post.enddate,
                 description: body.description || post.description,
-                imageUrl: body.imageUrl || post.imageUrl
+                imageurl: body.imageurl || post.imageurl
             }
             console.log(postData)
             const updPost = await update(postData,postId)
@@ -83,8 +106,11 @@ export async function deletePost(req,res,next){
         if(!post){
             res.status(404).send({msg:"Not Found"})
         }else{
+            const fileName = path.basename(post.imageurl)
+            const filePath = path.resolve(process.cwd(), 'uploads', fileName);
+            console.log(filePath)
+            await fs.unlink(filePath)
             const deletedPost = await remove(postId)
-            console.log(deletedPost)
             if(!deletedPost){
                 res.status(404).send({msg:"Error while deleting post"})
             }else{
