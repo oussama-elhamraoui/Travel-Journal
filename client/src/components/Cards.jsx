@@ -3,7 +3,7 @@ import { useState,useEffect } from 'react'
 import api from '../api/posts'
 import Card from './card'
 
-const Cards = ({deletePost,updatePost}) => {
+const Cards = ({deletePost}) => {
     const [posts,setPosts]=useState([])
     const [loading,setLoading]=useState(true)
     useEffect(()=>{
@@ -36,7 +36,7 @@ const Cards = ({deletePost,updatePost}) => {
     return (
         <div className='container'>
             <div className='grid grid-cols-1 gap-6'>
-               {posts.map(post =><Card key={post.id} post={post} deletePost={deletePost} updatePost={updatePost}/>)}
+               {posts.map(post =><Card key={post.id} post={post} deletePost={deletePost}/>)}
                {console.log(posts.map(post =><Card key={post.id} post={post}/>))}
                
             </div>

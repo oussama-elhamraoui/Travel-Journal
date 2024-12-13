@@ -36,13 +36,5 @@ const Card = ({post,deletePost}) => {
     </div>
   )
 }
-const postLoader = async(params)=>{
-  try{
-    console.log(params.id)
-    const response = await api.get(`http://localhost:5000/api/posts/${params.id}`)
-    console.log('Post fetched:',repsonse.data)
-  }catch(error){
-    console.error('Error updating post:', error.response ? error.response.data : error.message);
-  }
-}
-export {Card as default,postLoader}
+
+export default Card

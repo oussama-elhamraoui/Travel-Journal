@@ -5,6 +5,9 @@ import HomePage from './pages/HomePage'
 import api from './api/posts'
 import AddPostPage from './pages/AddPostPage'
 import EditPostPage, { postLoader } from './pages/EditPostPage'
+import SignUpPage from './pages/SignUpPage'
+import LoginPage from './pages/LoginPage'
+import { UserProvider } from '../context/UserContext'
 
 const App = () => {
   const addPost= async(formData)=>{
@@ -54,11 +57,15 @@ const App = () => {
   };
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<MainLayout/>}>
-        <Route index element={<HomePage deletePost={deletePost}/>}/>
-        <Route path='/add-post' element={<AddPostPage addPostSubmit={addPost}/>}/>
-        <Route path='/edit-post/:id' element={<EditPostPage updatePost={updatePost} />} loader={postLoader}/>
-      </Route>
+      <UserProvider>
+        <Route path="/" element={<MainLayout/>}>
+          <Route index element={<HomePage deletePost={deletePost}/>}/>
+          <Route path='/add-post' element={<AddPostPage addPostSubmit={addPost}/>}/>
+          <Route path='/edit-post/:id' element={<EditPostPage updatePost={updatePost} />} loader={postLoader}/>
+          <Route path='/signup' element={<SignUpPage/>}/>
+          <Route path='/login' element={<LoginPage/>}/>
+        </Route>
+      </UserProvider>
     )
   )
   return (
